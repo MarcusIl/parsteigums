@@ -540,67 +540,38 @@
         ];
 
         function initCrossword() {
-            const grid = document.getElementById('crosswordGrid');
-            grid.innerHTML = '';
-            
-            // 1. Build the grid
-            for (let i = 0; i < 100; i++) {
-                const cell = document.createElement('div');
-                cell.className = 'crossword-cell';
-                const row = Math.floor(i / 10);
-                const col = i % 10;
-                
-                const isBlack = !crosswordData.some(word => {
-                    if (word.dir === 'across') {
-                        return row === word.row && col >= word.col && col < word.col + word.answer.length;
+            const grid = document.getElementById('crossword-grid');
+            crosswordLayout.forEach((row, i) => {
+                row.forEach((cell, j) => {
+                    const cellDiv = document.createElement('div');
+                    cellDiv.className = 'crossword-cell';
+
+                    if (cell === null) {
+                        cellDiv.classList.add('black');
                     } else {
-                        return col === word.col && row >= word.row && row < word.row + word.answer.length;
-                    }
-                });
-        
-                if (isBlack) {
-                    cell.classList.add('black');
-                } else {
-                    const input = document.createElement('input');
-                    input.maxLength = 1;
-                    
-                    // Add clue numbers
-                    crosswordData.forEach(word => {
-                        if (word.row === row && word.col === col) {
-                            const num = document.createElement('span');
-                            num.className = 'number';
-                            num.textContent = word.id;
-                            cell.appendChild(num);
+                        if (cell.highlight) {
+                            cellDiv.classList.add('highlight');
                         }
-                    });
-                    cell.appendChild(input);
-                }
-                grid.appendChild(cell);
-            }
-        
-            // 2. --- THE AUTO-ADVANCE MAGIC ---
-            const allInputs = Array.from(grid.querySelectorAll('input'));
-            
-            allInputs.forEach((input, index) => {
-                // Move forward when typing
-                input.addEventListener('input', (e) => {
-                    if (e.target.value.length === 1) {
-                        const nextInput = allInputs[index + 1];
-                        if (nextInput) nextInput.focus();
+                        
+                        if (cell.num) {
+                            const numSpan = document.createElement('span');
+                            numSpan.className = 'number';
+                            numSpan.textContent = cell.num;
+                            cellDiv.appendChild(numSpan);
+                        }
+
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.maxLength = 1;
+                        input.id = `cross-${i}-${j}`;
+                        input.dataset.answer = cell.letter;
+                        input.oninput = (e) => {
+                            e.target.value = e.target.value.toUpperCase();
+                        };
+                        cellDiv.appendChild(input);
                     }
-                });
-        
-                // Move backward on backspace
-                input.addEventListener('keydown', (e) => {
-                    if (e.key === 'Backspace' && e.target.value === '') {
-                        const prevInput = allInputs[index - 1];
-                        if (prevInput) prevInput.focus();
-                    }
-                });
-        
-                // Force uppercase
-                input.addEventListener('keyup', (e) => {
-                    e.target.value = e.target.value.toUpperCase();
+
+                    grid.appendChild(cellDiv);
                 });
             });
         }
