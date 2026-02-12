@@ -186,13 +186,28 @@
         background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
         color: white;
         border: none;
-        padding: 14px;
-        border-radius: 25px;
-        font-size: 1rem;
-        font-weight: 600;
-        width: 100%;
-        margin-top: 15px;
-        box-shadow: 0 4px 10px rgba(255, 107, 157, 0.3);
+        padding: 16px 30px;
+        border-radius: 30px;
+        font-family: 'Quicksand', sans-serif;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        width: 100%; /* Keeps it mobile friendly */
+        max-width: 280px; /* Prevents it from being a giant bar on desktop */
+        display: block;
+        margin: 20px auto 0;
+        box-shadow: 0 6px 20px rgba(255, 107, 157, 0.4);
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        letter-spacing: 0.5px;
+    }
+    
+    .btn:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 8px 25px rgba(255, 107, 157, 0.5);
+    }
+    
+    .btn:active {
+        transform: translateY(0) scale(0.98);
     }
 
     .modal {
@@ -528,11 +543,10 @@
             const grid = document.getElementById('crosswordGrid');
             grid.innerHTML = '';
             
-            // Create the 10x10 grid
+            // 1. Build the grid
             for (let i = 0; i < 100; i++) {
                 const cell = document.createElement('div');
                 cell.className = 'crossword-cell';
-                
                 const row = Math.floor(i / 10);
                 const col = i % 10;
                 
@@ -549,9 +563,8 @@
                 } else {
                     const input = document.createElement('input');
                     input.maxLength = 1;
-                    input.dataset.idx = i; // Store original position
                     
-                    // Add numbering
+                    // Add clue numbers
                     crosswordData.forEach(word => {
                         if (word.row === row && word.col === col) {
                             const num = document.createElement('span');
@@ -560,34 +573,34 @@
                             cell.appendChild(num);
                         }
                     });
-                    
                     cell.appendChild(input);
                 }
                 grid.appendChild(cell);
             }
         
-            // --- NEW: AUTO-ADVANCE LOGIC ---
-            const inputs = Array.from(grid.querySelectorAll('input'));
+            // 2. --- THE AUTO-ADVANCE MAGIC ---
+            const allInputs = Array.from(grid.querySelectorAll('input'));
             
-            inputs.forEach((input, index) => {
-                // Move forward on type
+            allInputs.forEach((input, index) => {
+                // Move forward when typing
                 input.addEventListener('input', (e) => {
-                    e.target.value = e.target.value.toUpperCase();
-                    if (e.target.value && index < inputs.length - 1) {
-                        inputs[index + 1].focus();
+                    if (e.target.value.length === 1) {
+                        const nextInput = allInputs[index + 1];
+                        if (nextInput) nextInput.focus();
                     }
                 });
         
-                // Move backward on Backspace
+                // Move backward on backspace
                 input.addEventListener('keydown', (e) => {
-                    if (e.key === 'Backspace' && !e.target.value && index > 0) {
-                        inputs[index - 1].focus();
+                    if (e.key === 'Backspace' && e.target.value === '') {
+                        const prevInput = allInputs[index - 1];
+                        if (prevInput) prevInput.focus();
                     }
                 });
         
-                // Highlight related clues when clicking a cell
-                input.addEventListener('focus', () => {
-                    // Optional: add code here to highlight the current row/column clues
+                // Force uppercase
+                input.addEventListener('keyup', (e) => {
+                    e.target.value = e.target.value.toUpperCase();
                 });
             });
         }
