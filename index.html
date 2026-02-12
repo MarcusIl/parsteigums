@@ -223,6 +223,33 @@
     .modal.active { display: flex; }
     .modal-content { background: white; padding: 25px; border-radius: 20px; text-align: center; width: 100%; max-width: 300px; }
 
+    .modal-btn {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 25px;
+        font-family: 'Quicksand', sans-serif;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        margin-top: 20px;
+        box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3);
+        transition: all 0.3s ease;
+        width: auto;
+        min-width: 140px;
+    }
+    
+    .modal-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 107, 157, 0.4);
+        filter: brightness(1.05);
+    }
+    
+    .modal-btn:active {
+        transform: translateY(0);
+    }
+
     /* MOBILE OVERRIDES */
     @media (max-width: 380px) {
         .container { padding: 15px 10px; }
