@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💕 Uzlauz kodu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff6b9d;
+            --secondary: #ffc1e3;
+            --accent: #ff1744;
+            --dark: #2d1b2e;
+            --light: #fff5f8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(135deg, #ffeef8 0%, #ffe5f1 50%, #ffd9eb 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(255, 107, 157, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 193, 227, 0.15) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(255, 107, 157, 0.3);
+            max-width: 500px;
+            width: 100%;
+            padding: 60px 40px;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            color: var(--primary);
+            font-size: 3rem;
+            margin-bottom: 40px;
+            text-shadow: 2px 2px 4px rgba(255, 107, 157, 0.2);
+            font-weight: 700;
+        }
+
+        .code-inputs {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .code-input {
+            width: 70px;
+            height: 80px;
+            border: 3px solid var(--secondary);
+            border-radius: 15px;
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            font-family: 'Cormorant Garamond', serif;
+            color: var(--primary);
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .code-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--light);
+            transform: scale(1.05);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            border: none;
+            padding: 18px 50px;
+            border-radius: 30px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 157, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .error-message {
+            color: var(--accent);
+            font-size: 1.2rem;
+            margin-top: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .error-message.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            .container {
+                padding: 40px 30px;
+            }
+
+            .code-input {
+                width: 60px;
+                height: 70px;
+                font-size: 2rem;
+            }
+
+            .btn {
+                font-size: 1.1rem;
+                padding: 15px 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Uzlauz mani ;)</h1>
+        
+        <div class="code-inputs">
+            <input type="text" class="code-input" id="code1" maxlength="1" oninput="moveToNext(this, null)">
+            <input type="text" class="code-input" id="code2" maxlength="1" oninput="moveToNext(this, 'code1')">
+            <input type="text" class="code-input" id="code3" maxlength="1" oninput="moveToNext(this, 'code2')">
+        </div>
+
+        <button class="btn" onclick="checkCode()">Iesniegt</button>
+
+        <div class="error-message" id="error">Nepareizi :(</div>
+    </div>
+
+    <script>
+        const correctCode = ['I', 'L', 'Y'];
+
+        function moveToNext(current, previousId) {
+            current.value = current.value.toUpperCase();
+            
+            if (current.value && current.nextElementSibling && current.nextElementSibling.classList.contains('code-input')) {
+                current.nextElementSibling.focus();
+            }
+
+            // Handle backspace
+            current.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !current.value && previousId) {
+                    document.getElementById(previousId).focus();
+                }
+            });
+        }
+
+        function checkCode() {
+            const input1 = document.getElementById('code1').value.toUpperCase();
+            const input2 = document.getElementById('code2').value.toUpperCase();
+            const input3 = document.getElementById('code3').value.toUpperCase();
+
+            const errorMsg = document.getElementById('error');
+
+            if (input1 === correctCode[0] && input2 === correctCode[1] && input3 === correctCode[2]) {
+                window.location.href = 'valentine.html';
+            } else {
+                errorMsg.classList.add('show');
+                setTimeout(() => {
+                    errorMsg.classList.remove('show');
+                }, 2000);
+
+                // Shake animation
+                document.querySelector('.code-inputs').style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    document.querySelector('.code-inputs').style.animation = '';
+                }, 500);
+            }
+        }
+
+        // Auto-focus first input
+        document.getElementById('code1').focus();
+
+        // Add shake animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-10px); }
+                75% { transform: translateX(10px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Enter key support
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                checkCode();
+            }
+        });
+    </script>
+</body>
+</html>

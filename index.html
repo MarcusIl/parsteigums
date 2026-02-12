@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>❤️ Valentine's Surprise</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff6b9d;
+            --secondary: #ffc1e3;
+            --accent: #ff1744;
+            --dark: #2d1b2e;
+            --light: #fff5f8;
+            --correct: #86c18c;
+            --present: #f4c430;
+            --absent: #787c7e;
+            --error: #ff6b6b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(135deg, #ffeef8 0%, #ffe5f1 50%, #ffd9eb 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(255, 107, 157, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 193, 227, 0.15) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(255, 107, 157, 0.3);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            color: var(--primary);
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(255, 107, 157, 0.2);
+            font-weight: 700;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--dark);
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
+
+        .game-container {
+            display: none;
+        }
+
+        .game-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Wordle Styles */
+        .wordle-grid {
+            display: grid;
+            gap: 8px;
+            margin: 20px 0;
+        }
+
+        .wordle-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+        }
+
+        .wordle-cell {
+            aspect-ratio: 1;
+            border: 3px solid var(--secondary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: var(--dark);
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .wordle-cell.filled {
+            border-color: var(--primary);
+        }
+
+        .wordle-cell.correct {
+            background: var(--correct);
+            border-color: var(--correct);
+            color: white;
+            animation: flip 0.5s ease;
+        }
+
+        .wordle-cell.present {
+            background: var(--present);
+            border-color: var(--present);
+            color: white;
+            animation: flip 0.5s ease;
+        }
+
+        .wordle-cell.absent {
+            background: var(--absent);
+            border-color: var(--absent);
+            color: white;
+            animation: flip 0.5s ease;
+        }
+
+        @keyframes flip {
+            0% { transform: rotateX(0); }
+            50% { transform: rotateX(90deg); }
+            100% { transform: rotateX(0); }
+        }
+
+        .keyboard {
+            display: grid;
+            gap: 6px;
+            margin-top: 20px;
+        }
+
+        .keyboard-row {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+        }
+
+        .key {
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            background: var(--secondary);
+            color: var(--dark);
+            font-family: 'Quicksand', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            max-width: 40px;
+        }
+
+        .key.wide {
+            flex: 1.5;
+            max-width: 65px;
+            font-size: 0.85rem;
+        }
+
+        .key:active {
+            transform: scale(0.95);
+        }
+
+        .key.correct {
+            background: var(--correct);
+            color: white;
+        }
+
+        .key.present {
+            background: var(--present);
+            color: white;
+        }
+
+        .key.absent {
+            background: var(--absent);
+            color: white;
+        }
+
+        /* Sudoku Styles */
+        .sudoku-grid {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 0;
+            margin: 20px 0;
+            border: 3px solid var(--dark);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .sudoku-cell {
+            aspect-ratio: 1;
+            border: 1px solid var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            font-weight: 600;
+            background: white;
+        }
+
+        .sudoku-cell:nth-child(3n) {
+            border-right: 3px solid var(--dark);
+        }
+
+        .sudoku-cell:nth-child(n+19):nth-child(-n+27),
+        .sudoku-cell:nth-child(n+46):nth-child(-n+54) {
+            border-bottom: 3px solid var(--dark);
+        }
+
+        .sudoku-cell input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: 600;
+            font-family: 'Quicksand', sans-serif;
+            background: transparent;
+            color: var(--primary);
+        }
+
+        .sudoku-cell input:focus {
+            outline: none;
+            background: var(--light);
+        }
+
+        .sudoku-cell input.given {
+            color: var(--dark);
+            font-weight: 700;
+        }
+
+        .sudoku-cell input.error {
+            color: var(--error);
+        }
+
+        .sudoku-cell input:disabled {
+            color: var(--dark);
+        }
+
+        /* Crossword Styles */
+        .crossword-container {
+            margin: 20px 0;
+        }
+
+        .crossword-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 2px;
+            margin-bottom: 20px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .crossword-cell {
+            aspect-ratio: 1;
+            border: 2px solid var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            background: white;
+            position: relative;
+            border-radius: 4px;
+        }
+
+        .crossword-cell.black {
+            background: var(--dark);
+            border-color: var(--dark);
+        }
+
+        .crossword-cell input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            font-family: 'Quicksand', sans-serif;
+            text-transform: uppercase;
+            background: transparent;
+            color: var(--primary);
+        }
+
+        .crossword-cell.highlight {
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--light) 100%);
+            border-color: var(--primary);
+        }
+
+        .crossword-cell .number {
+            position: absolute;
+            top: 2px;
+            left: 4px;
+            font-size: 0.6rem;
+            color: var(--dark);
+            font-weight: 700;
+        }
+
+        .clues {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .clue {
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .clue strong {
+            color: var(--primary);
+        }
+
+        /* Buttons */
+        .btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 157, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(45, 27, 46, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-content h2 {
+            font-family: 'Cormorant Garamond', serif;
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .modal-content p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: var(--dark);
+        }
+
+        .modal-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            border: none;
+            padding: 12px 40px;
+            border-radius: 25px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 157, 0.5);
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 30px 20px;
+            }
+
+            .wordle-cell {
+                font-size: 1.5rem;
+            }
+
+            .key {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+
+            .sudoku-cell input {
+                font-size: 1.1rem;
+            }
+
+            .crossword-cell input {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💕 Pārsteigums! 💕</h1>
+        <p class="subtitle">Izpildi visus uzdevumus, lai saņemtu kodu...</p>
+
+        <!-- Wordle Game -->
+        <div id="wordle-game" class="game-container active">
+            <h2 style="text-align: center; color: var(--dark); margin-bottom: 20px;">Uzminiet vārdu (5 burti)</h2>
+            <div class="wordle-grid" id="wordle-grid"></div>
+            <div class="keyboard" id="keyboard"></div>
+        </div>
+
+        <!-- Sudoku Game -->
+        <div id="sudoku-game" class="game-container">
+            <h2 style="text-align: center; color: var(--dark); margin-bottom: 20px;">Atrisiniet Sudoku</h2>
+            <div class="sudoku-grid" id="sudoku-grid"></div>
+            <button class="btn" onclick="checkSudoku()">Pārbaudīt</button>
+        </div>
+
+        <!-- Crossword Game -->
+        <div id="crossword-game" class="game-container">
+            <h2 style="text-align: center; color: var(--dark); margin-bottom: 20px;">Krustvārdu mīkla</h2>
+            <div class="crossword-container">
+                <div class="crossword-grid" id="crossword-grid"></div>
+                <div class="clues">
+                    <div class="clue"><strong>1.</strong> Kā es bieži saucu Luniņu</div>
+                    <div class="clue"><strong>2.</strong> Kas tev "nekut"</div>
+                    <div class="clue"><strong>3.</strong> Ko man visvairāk patīk tevī bučot</div>
+                    <div class="clue"><strong>4.</strong> Kāda tu esi - sinonīms "perfekta" ;)</div>
+                    <div class="clue"><strong>5.</strong> "meow" latviski</div>
+                    <div class="clue"><strong>6.</strong> Pasta ...</div>
+                </div>
+            </div>
+            <button class="btn" onclick="checkCrossword()">Pārbaudīt</button>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <h2 id="modal-title">Bravo!</h2>
+            <p id="modal-text">Pieraksti šo: 1 - I</p>
+            <button class="modal-btn" id="modal-btn" onclick="nextChallenge()">Nākamais izaicinājums</button>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        let currentGame = 1;
+        let wordleAttempts = 0;
+        const targetWord = 'HEART';
+        let currentGuess = '';
+        let currentRow = 0;
+
+        // Wordle keyboard layout
+        const keyboardRows = [
+            ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+            ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
+            ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '⌫']
+        ];
+
+        // Initialize Wordle
+        function initWordle() {
+            const grid = document.getElementById('wordle-grid');
+            const keyboard = document.getElementById('keyboard');
+
+            // Create grid
+            for (let i = 0; i < 6; i++) {
+                const row = document.createElement('div');
+                row.className = 'wordle-row';
+                for (let j = 0; j < 5; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'wordle-cell';
+                    cell.id = `cell-${i}-${j}`;
+                    row.appendChild(cell);
+                }
+                grid.appendChild(row);
+            }
+
+            // Create keyboard
+            keyboardRows.forEach(row => {
+                const keyboardRow = document.createElement('div');
+                keyboardRow.className = 'keyboard-row';
+                row.forEach(key => {
+                    const keyBtn = document.createElement('button');
+                    keyBtn.className = 'key' + (key.length > 1 ? ' wide' : '');
+                    keyBtn.textContent = key;
+                    keyBtn.onclick = () => handleKey(key);
+                    keyBtn.id = 'key-' + key;
+                    keyboardRow.appendChild(keyBtn);
+                });
+                keyboard.appendChild(keyboardRow);
+            });
+        }
+
+        function handleKey(key) {
+            if (key === 'ENTER') {
+                if (currentGuess.length === 5) {
+                    submitGuess();
+                }
+            } else if (key === '⌫') {
+                if (currentGuess.length > 0) {
+                    currentGuess = currentGuess.slice(0, -1);
+                    updateDisplay();
+                }
+            } else {
+                if (currentGuess.length < 5) {
+                    currentGuess += key;
+                    updateDisplay();
+                }
+            }
+        }
+
+        function updateDisplay() {
+            for (let i = 0; i < 5; i++) {
+                const cell = document.getElementById(`cell-${currentRow}-${i}`);
+                cell.textContent = currentGuess[i] || '';
+                cell.className = 'wordle-cell' + (currentGuess[i] ? ' filled' : '');
+            }
+        }
+
+        function submitGuess() {
+            const guess = currentGuess;
+            const row = currentRow;
+
+            // Check each letter
+            const letterCount = {};
+            for (let char of targetWord) {
+                letterCount[char] = (letterCount[char] || 0) + 1;
+            }
+
+            const result = Array(5).fill('absent');
+
+            // First pass: mark correct positions
+            for (let i = 0; i < 5; i++) {
+                if (guess[i] === targetWord[i]) {
+                    result[i] = 'correct';
+                    letterCount[guess[i]]--;
+                }
+            }
+
+            // Second pass: mark present letters
+            for (let i = 0; i < 5; i++) {
+                if (result[i] === 'absent' && targetWord.includes(guess[i]) && letterCount[guess[i]] > 0) {
+                    result[i] = 'present';
+                    letterCount[guess[i]]--;
+                }
+            }
+
+            // Update cells
+            for (let i = 0; i < 5; i++) {
+                const cell = document.getElementById(`cell-${row}-${i}`);
+                setTimeout(() => {
+                    cell.className = `wordle-cell ${result[i]}`;
+                }, i * 100);
+            }
+
+            // Update keyboard with proper priority: Green > Yellow > Gray
+            for (let i = 0; i < 5; i++) {
+                const letter = guess[i];
+                const keyBtn = document.getElementById('key-' + letter);
+                if (keyBtn) {
+                    // Priority: correct > present > absent
+                    if (result[i] === 'correct') {
+                        // Green always wins
+                        keyBtn.classList.remove('present', 'absent');
+                        keyBtn.classList.add('correct');
+                    } else if (result[i] === 'present') {
+                        // Yellow only if not already green
+                        if (!keyBtn.classList.contains('correct')) {
+                            keyBtn.classList.remove('absent');
+                            keyBtn.classList.add('present');
+                        }
+                    } else if (result[i] === 'absent') {
+                        // Gray only if not already green or yellow
+                        if (!keyBtn.classList.contains('correct') && !keyBtn.classList.contains('present')) {
+                            keyBtn.classList.add('absent');
+                        }
+                    }
+                }
+            }
+
+            // Check win
+            if (guess === targetWord) {
+                setTimeout(() => {
+                    showModal('Bravo!', 'Pieraksti šo: 1 - I', 'Nākamais izaicinājums');
+                }, 1500);
+            } else {
+                currentRow++;
+                currentGuess = '';
+                if (currentRow >= 6) {
+                    setTimeout(() => {
+                        alert('Vārds bija: HEART. Mēģini vēlreiz!');
+                        location.reload();
+                    }, 1000);
+                }
+            }
+        }
+
+        // Sudoku puzzle (very easy - 17 empty cells distributed across grid)
+        const sudokuPuzzle = [
+            [5, 3, 4, 0, 7, 8, 9, 1, 2],
+            [6, 7, 0, 1, 9, 5, 3, 4, 8],
+            [1, 9, 8, 3, 0, 2, 5, 6, 7],
+            [8, 5, 9, 7, 6, 0, 4, 2, 3],
+            [4, 0, 6, 8, 5, 3, 0, 9, 1],
+            [7, 1, 3, 0, 2, 4, 8, 5, 6],
+            [9, 6, 0, 5, 3, 7, 2, 8, 4],
+            [2, 8, 7, 4, 0, 9, 6, 3, 5],
+            [3, 4, 5, 2, 8, 6, 0, 7, 9]
+        ];
+
+        const sudokuSolution = [
+            [5, 3, 4, 6, 7, 8, 9, 1, 2],
+            [6, 7, 2, 1, 9, 5, 3, 4, 8],
+            [1, 9, 8, 3, 4, 2, 5, 6, 7],
+            [8, 5, 9, 7, 6, 1, 4, 2, 3],
+            [4, 2, 6, 8, 5, 3, 7, 9, 1],
+            [7, 1, 3, 9, 2, 4, 8, 5, 6],
+            [9, 6, 1, 5, 3, 7, 2, 8, 4],
+            [2, 8, 7, 4, 1, 9, 6, 3, 5],
+            [3, 4, 5, 2, 8, 6, 1, 7, 9]
+        ];
+
+        function initSudoku() {
+            const grid = document.getElementById('sudoku-grid');
+            for (let i = 0; i < 9; i++) {
+                for (let j = 0; j < 9; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'sudoku-cell';
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.maxLength = 1;
+                    input.id = `sudoku-${i}-${j}`;
+
+                    if (sudokuPuzzle[i][j] !== 0) {
+                        input.value = sudokuPuzzle[i][j];
+                        input.disabled = true;
+                        input.classList.add('given');
+                    } else {
+                        input.oninput = (e) => validateSudokuInput(e, i, j);
+                    }
+
+                    cell.appendChild(input);
+                    grid.appendChild(cell);
+                }
+            }
+        }
+
+        function validateSudokuInput(e, row, col) {
+            const value = e.target.value;
+            if (value && !/^[1-9]$/.test(value)) {
+                e.target.value = '';
+                return;
+            }
+
+            if (value) {
+                const correctValue = sudokuSolution[row][col];
+                if (parseInt(value) !== correctValue) {
+                    e.target.classList.add('error');
+                } else {
+                    e.target.classList.remove('error');
+                }
+            } else {
+                e.target.classList.remove('error');
+            }
+        }
+
+        function checkSudoku() {
+            let correct = true;
+            for (let i = 0; i < 9; i++) {
+                for (let j = 0; j < 9; j++) {
+                    const input = document.getElementById(`sudoku-${i}-${j}`);
+                    const value = parseInt(input.value);
+                    if (value !== sudokuSolution[i][j]) {
+                        correct = false;
+                        break;
+                    }
+                }
+                if (!correct) break;
+            }
+
+            if (correct) {
+                showModal('Lieliski!', 'Pieraksti šo: 2 - L', 'Nākamais izaicinājums');
+            } else {
+                alert('Nav pilnīgi pareizi! Mēģini vēl!');
+            }
+        }
+
+        // Crossword - words positioned so PUPIŅA forms vertically
+        // Column 3 contains the vertical word PUPIŅA
+        const crosswordLayout = [
+            // Row 0: PELĪTE - P at column 3
+            [null, null, null, {letter: 'P', num: 1, highlight: true}, {letter: 'E'}, {letter: 'L'}, {letter: 'Ī'}, {letter: 'T'}, {letter: 'E'}, null],
+            // Row 1: PADUSE - U at column 3 (P-A-D-U)
+            [{letter: 'P', num: 2}, {letter: 'A'}, {letter: 'D'}, {letter: 'U', highlight: true}, {letter: 'S'}, {letter: 'E'}, null, null, null, null],
+            // Row 2: LŪPAS - P at column 3 (L-Ū-P)
+            [null, {letter: 'L', num: 3}, {letter: 'Ū'}, {letter: 'P', highlight: true}, {letter: 'A'}, {letter: 'S'}, null, null, null, null],
+            // Row 3: IDEĀLA - I at column 3
+            [null, null, null, {letter: 'I', num: 4, highlight: true}, {letter: 'D'}, {letter: 'E'}, {letter: 'Ā'}, {letter: 'L'}, {letter: 'A'}, null],
+            // Row 4: ŅAU - Ņ at column 3
+            [null, null, null, {letter: 'Ņ', num: 5, highlight: true}, {letter: 'A'}, {letter: 'U'}, null, null, null, null],
+            // Row 5: ALFREDO - A at column 3
+            [null, null, null, {letter: 'A', num: 6, highlight: true}, {letter: 'L'}, {letter: 'F'}, {letter: 'R'}, {letter: 'E'}, {letter: 'D'}, {letter: 'O'}]
+        ];
+
+        function initCrossword() {
+            const grid = document.getElementById('crossword-grid');
+            crosswordLayout.forEach((row, i) => {
+                row.forEach((cell, j) => {
+                    const cellDiv = document.createElement('div');
+                    cellDiv.className = 'crossword-cell';
+
+                    if (cell === null) {
+                        cellDiv.classList.add('black');
+                    } else {
+                        if (cell.highlight) {
+                            cellDiv.classList.add('highlight');
+                        }
+                        
+                        if (cell.num) {
+                            const numSpan = document.createElement('span');
+                            numSpan.className = 'number';
+                            numSpan.textContent = cell.num;
+                            cellDiv.appendChild(numSpan);
+                        }
+
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.maxLength = 1;
+                        input.id = `cross-${i}-${j}`;
+                        input.dataset.answer = cell.letter;
+                        input.oninput = (e) => {
+                            e.target.value = e.target.value.toUpperCase();
+                        };
+                        cellDiv.appendChild(input);
+                    }
+
+                    grid.appendChild(cellDiv);
+                });
+            });
+        }
+
+        function checkCrossword() {
+            let correct = true;
+            crosswordLayout.forEach((row, i) => {
+                row.forEach((cell, j) => {
+                    if (cell !== null) {
+                        const input = document.getElementById(`cross-${i}-${j}`);
+                        if (input.value.toUpperCase() !== cell.letter) {
+                            correct = false;
+                        }
+                    }
+                });
+            });
+
+            if (correct) {
+                showModal('Perfekti!', 'Pieraksti šo: 3 - Y', 'Uzlauzt kodu');
+            } else {
+                alert('Nav pilnīgi pareizi! Pārbaudi vēlreiz!');
+            }
+        }
+
+        function showModal(title, text, btnText) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-text').textContent = text;
+            document.getElementById('modal-btn').textContent = btnText;
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function nextChallenge() {
+            document.getElementById('modal').classList.remove('active');
+            currentGame++;
+
+            if (currentGame === 2) {
+                document.getElementById('wordle-game').classList.remove('active');
+                document.getElementById('sudoku-game').classList.add('active');
+            } else if (currentGame === 3) {
+                document.getElementById('sudoku-game').classList.remove('active');
+                document.getElementById('crossword-game').classList.add('active');
+            } else if (currentGame === 4) {
+                window.location.href = 'code.html';
+            }
+        }
+
+        // Initialize games
+        initWordle();
+        initSudoku();
+        initCrossword();
+
+        // Keyboard support for Wordle
+        document.addEventListener('keydown', (e) => {
+            if (currentGame === 1) {
+                if (e.key === 'Enter') {
+                    handleKey('ENTER');
+                } else if (e.key === 'Backspace') {
+                    handleKey('⌫');
+                } else if (/^[a-zA-Z]$/.test(e.key)) {
+                    handleKey(e.key.toUpperCase());
+                }
+            }
+        });
+    </script>
+</body>
+</html>
