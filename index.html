@@ -525,38 +525,69 @@
         ];
 
         function initCrossword() {
-            const grid = document.getElementById('crossword-grid');
-            crosswordLayout.forEach((row, i) => {
-                row.forEach((cell, j) => {
-                    const cellDiv = document.createElement('div');
-                    cellDiv.className = 'crossword-cell';
-
-                    if (cell === null) {
-                        cellDiv.classList.add('black');
+            const grid = document.getElementById('crosswordGrid');
+            grid.innerHTML = '';
+            
+            // Create the 10x10 grid
+            for (let i = 0; i < 100; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'crossword-cell';
+                
+                const row = Math.floor(i / 10);
+                const col = i % 10;
+                
+                const isBlack = !crosswordData.some(word => {
+                    if (word.dir === 'across') {
+                        return row === word.row && col >= word.col && col < word.col + word.answer.length;
                     } else {
-                        if (cell.highlight) {
-                            cellDiv.classList.add('highlight');
-                        }
-                        
-                        if (cell.num) {
-                            const numSpan = document.createElement('span');
-                            numSpan.className = 'number';
-                            numSpan.textContent = cell.num;
-                            cellDiv.appendChild(numSpan);
-                        }
-
-                        const input = document.createElement('input');
-                        input.type = 'text';
-                        input.maxLength = 1;
-                        input.id = `cross-${i}-${j}`;
-                        input.dataset.answer = cell.letter;
-                        input.oninput = (e) => {
-                            e.target.value = e.target.value.toUpperCase();
-                        };
-                        cellDiv.appendChild(input);
+                        return col === word.col && row >= word.row && row < word.row + word.answer.length;
                     }
-
-                    grid.appendChild(cellDiv);
+                });
+        
+                if (isBlack) {
+                    cell.classList.add('black');
+                } else {
+                    const input = document.createElement('input');
+                    input.maxLength = 1;
+                    input.dataset.idx = i; // Store original position
+                    
+                    // Add numbering
+                    crosswordData.forEach(word => {
+                        if (word.row === row && word.col === col) {
+                            const num = document.createElement('span');
+                            num.className = 'number';
+                            num.textContent = word.id;
+                            cell.appendChild(num);
+                        }
+                    });
+                    
+                    cell.appendChild(input);
+                }
+                grid.appendChild(cell);
+            }
+        
+            // --- NEW: AUTO-ADVANCE LOGIC ---
+            const inputs = Array.from(grid.querySelectorAll('input'));
+            
+            inputs.forEach((input, index) => {
+                // Move forward on type
+                input.addEventListener('input', (e) => {
+                    e.target.value = e.target.value.toUpperCase();
+                    if (e.target.value && index < inputs.length - 1) {
+                        inputs[index + 1].focus();
+                    }
+                });
+        
+                // Move backward on Backspace
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                        inputs[index - 1].focus();
+                    }
+                });
+        
+                // Highlight related clues when clicking a cell
+                input.addEventListener('focus', () => {
+                    // Optional: add code here to highlight the current row/column clues
                 });
             });
         }
